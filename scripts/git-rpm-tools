@@ -153,6 +153,7 @@ do
     v)      VERB=1;;
     x)      set -x;;
     h)      usage;;
+    ?)      usage;;
     esac
 done
 shift $(($OPTIND - 1))
