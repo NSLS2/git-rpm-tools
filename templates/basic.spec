@@ -1,3 +1,5 @@
+# basic.spec
+
 Name:           basic-package
 Version:        1
 Release:        1%{?dist}

@@ -4,17 +4,17 @@ Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
 License:        GPL
-#URL:
+URL:            https://github.com/NSLS2/git-rpm-tools
 Source0:        %{name}-%{version}.tar.gz
 
 #BuildRequires:
-Requires:       bash
+Requires:       bash rpmdevtools
 
-BuildArch:      x86_64
+#BuildArch:      x86_64
 #ExclusiveArch:  x86_64
 
 # Prevent rpmbuild from smart-generating dependencies list
-AutoReq:        no
+#AutoReq:        no
 
 # Prevent rpmbuild from auto-mangling executable shebangs
 #%undefine __brp_mangle_shebangs
@@ -37,6 +37,5 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 
 %changelog
 
-* Mon Mar 7 2022 Anton Derbenev <aderbenev@bnl.gov> - 1-1
+* Mon Mar 7 2022 Anton Derbenev <aderbenev@bnl.gov> - 0.1-1
 - First version
-
