@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+
+# Print warning message in stderr
+# $1 - message to output
+warn() {
+  echo "$1" >&2
+}
+
+# Exit with return code
+# $1 - message to output in stderr
+# $2 - return code
+function die() {
+    echo "$1" >&2
+    exit ${2:-1}
+}
+
+function build_prep() {
+    WORK_DIR=$PWD
+    echo "Selecting work dir: $WORK_DIR"
+
+    # TODO: figure out git branch
+    # currently use "main"
+    GIT_BRANCH=$(git branch --show-current)
+    echo "Selecting branch: $GIT_BRANCH"
+
+    # TODO: figure out package name
+    # currently use "${WORK_DIR##*/}"
+    PKG_NAME="${WORK_DIR##*/}"
+    echo "Selecting package name: $PKG_NAME"
+
+    # TODO: figure out where to build
+    # currently use "rpmbuildtree"
+    # !WARNING! This is cleaned up later
+    BUILD_TREE="$PWD/rpmbuildtree"
+    echo "Selecting build tree: $BUILD_TREE"
+    #[[ -d $BUILD_TREE ]] && die "Error: $BUILD_TREE exists, clean up first!"
+    mkdir -p $BUILD_TREE
+
+    # TODO: figure out specfile to use
+    # currently use "${PWD##*/}.spec"
+    SPEC_FILE="$PKG_NAME.spec"
+    echo "Selecting spec file: $SPEC_FILE"
+    [[ ! -f $SPEC_FILE ]] && die "Error: $SPEC_FILE does not exist!"
+
+    # Figure out package version
+    # can use grep Version <>.spec | sed 's/Version.*\([0-9.]\+\)$/\1/g'
+    # or rpmspec -q --queryformat='%{version}-%{release}' <>.spec
+    PKG_VERSION=$(rpmspec -q --queryformat='%{version}' $SPEC_FILE)
+    echo "Selecting package version: $PKG_VERSION"
+
+    # Copy .rpm to SPECS
+    echo "Moving $SPEC_FILE to $BUILD_TREE/SPECS"
+    mkdir -p $BUILD_TREE/SPECS
+    cp $SPEC_FILE $BUILD_TREE/SPECS
+
+    # Archive selected repo branch, put in SOURCES
+    echo "Archiving sources to: $BUILD_TREE/SOURCES"
+    mkdir -p $BUILD_TREE/SOURCES
+    git archive --prefix="$PKG_NAME-$PKG_VERSION/" --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$PKG_NAME-$PKG_VERSION.tar.gz
+
+    # Figure out dist identifier, e.g. epochtime-[branchname-]osver
+    # using release number from spec for now
+    PKG_RELEASE=$(rpmspec -q --queryformat='%{release}' $SPEC_FILE)
+    echo "Selecting package release: $PKG_RELEASE"
+}
+
+function build_pkg() {
+    [ -z "$1" ] && die "Error: rpmbuild needs -bb (RPM), -bs (SRPM), or -ba (both) but no option is provided"
+    # Build rpm in created tree with selected dist
+    echo "Running rpmbuild"
+    rpmbuild -v --noclean \
+            --define "_topdir $BUILD_TREE" \
+            --define "_builddir %{_topdir}/BUILD" \
+            --define "_rpmdir %{_topdir}/RPMS" \
+            --define "_sourcedir %{_topdir}/SOURCES" \
+            --define "_specdir %{_topdir}/SPECS" \
+            --define "_srcrpmdir %{_topdir}/SRPMS" \
+            --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
+            --define "debug_package %{nil}" \
+            -$1 $BUILD_TREE/SPECS/*.spec
+
+    # Move artifacts to root dir
+    artifacts=()
+    case $1 in
+        bb|ba)
+            #mv $BUILD_TREE/RPMS/*.rpm $WORK_DIR
+            artifacts+=("$BUILD_TREE/RPMS/*.rpm")
+            ;;& # <- note the ampersand will fall through to process ba
+        bs|ba)
+            #mv $BUILD_TREE/SRPMS/*.src.rpm $WORK_DIR
+            artifacts+=("$BUILD_TREE/SRPMS/*.src.rpm")
+            ;;
+        *)
+            warn "Warning: Unsupported build option to rpmbuild: $1, artifacts not moved"
+            ;;
+    esac
+
+    for art in "${artifacts[@]}"
+    do
+        echo "Copying artifacts: $art"
+        mv $art $WORK_DIR
+    done
+}
+
+function build_cleanup() {
+    # Clean buildtree
+    rm -r $BUILD_TREE
+}
+
+function git_rpm_build() {
+    [ -z "$1" ] && die "Error: rpmbuild needs -bb (RPM), -bs (SRPM), or -ba (both) but no option is provided"
+    build_prep
+    build_pkg $1
+    build_cleanup
+}
+
+function usage() {
+    printf "Usage: %s [-v] [-x] [cmd]\n" `basename $0`
+    echo "Available options:"
+    echo "  v                                          - be verbose about SNACK invocation"
+    echo "  x                                          - set -x for script debug"
+    echo "Available commands:"
+    echo "  bb                                         - perform RPM build (binary)"
+    echo "  bs                                         - perform SRPM build (source)"
+    echo "  ba                                         - perform both RPM and SRPM build"
+    exit 2
+}
+
+while getopts vxh arg
+do
+    case $arg in
+    v)      VERB=1;;
+    x)      set -x;;
+    h)      usage;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+cmd="$1"
+
+case "$cmd" in
+    help)
+        usage
+        ;;
+    bb)
+        git_rpm_build bb
+        ;;
+    bs)
+        git_rpm_build bs
+        ;;
+    ba|"")
+        git_rpm_build ba
+        ;;
+    *)
+        usage
+    ;;
+esac
