@@ -32,12 +32,15 @@ function runchecks() {
 }
 
 function build_prep() {
+    # Resolve vars
+    #
+    #
     WORK_DIR=$PWD
     echo "Selecting work dir: $WORK_DIR"
 
     # TODO: figure out git branch
-    # currently use "main"
-    GIT_BRANCH=$(git branch --show-current)
+    # currently use env variable, or current checked out
+    GIT_BRANCH=${GIT_BRANCH:-$(git branch --show-current)}
     echo "Selecting branch: $GIT_BRANCH"
 
     # TODO: figure out package name
@@ -51,11 +54,10 @@ function build_prep() {
     BUILD_TREE="$PWD/rpmbuildtree"
     echo "Selecting build tree: $BUILD_TREE"
     #[[ -d $BUILD_TREE ]] && die "Error: $BUILD_TREE exists, clean up first!"
-    mkdir -p $BUILD_TREE
 
     # TODO: figure out specfile to use
     # currently use "${PWD##*/}.spec"
-    SPEC_FILE="$PKG_NAME.spec"
+    SPEC_FILE=${SPEC_FILE:-"./dist/$PKG_NAME.spec"}
     echo "Selecting spec file: $SPEC_FILE"
     [[ ! -f $SPEC_FILE ]] && die "Error: $SPEC_FILE does not exist!"
 
@@ -64,6 +66,12 @@ function build_prep() {
     # or rpmspec -q --queryformat='%{version}-%{release}' <>.spec
     PKG_VERSION=$(rpmspec -q --queryformat='%{version}' $SPEC_FILE)
     echo "Selecting package version: $PKG_VERSION"
+    #
+    #
+    # End resolve vars
+
+    # Create build directory tree
+    mkdir -p $BUILD_TREE
 
     # Copy .rpm to SPECS
     echo "Moving $SPEC_FILE to $BUILD_TREE/SPECS"
@@ -136,20 +144,25 @@ function git_rpm_build() {
 }
 
 function usage() {
-    printf "Usage: %s [-v] [-x] [cmd]\n" `basename $0`
-    echo "Available options:"
-    echo "  v                                          - be verbose about SNACK invocation"
-    echo "  x                                          - set -x for script debug"
-    echo "Available commands:"
-    echo "  bb                                         - perform RPM build (binary)"
-    echo "  bs                                         - perform SRPM build (source)"
-    echo "  ba                                         - perform both RPM and SRPM build"
+    printf "Usage: %s [-v] [-x] [-b branch] [-s specfile] [cmd]\n" `basename $0`
+    echo "
+Available options:
+  v                                          - be verbose about SNACK invocation
+  x                                          - set -x for script debug
+  b                                          - branch to select when packing source
+  s                                          - .spec file to use
+Available commands:
+  bb                                         - perform RPM build (binary)
+  bs                                         - perform SRPM build (source)
+  ba                                         - perform both RPM and SRPM build"
     exit 2
 }
 
-while getopts vxh arg
+while getopts 'vxhb:s:' arg
 do
     case $arg in
+    b)      GIT_BRANCH=$OPTARG;;
+    s)      SPEC_FILE=$OPTARG;;
     v)      VERB=1;;
     x)      set -x;;
     h)      usage;;
