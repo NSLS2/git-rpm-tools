@@ -1,14 +1,11 @@
 name: Run oneself to build self rpm
 on: workflow_dispatch
 jobs:
-  build:
+  build-upload:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - run: ./scripts/git-rpm-tools ba
-  upload:
-    runs-on: self-hosted
-    steps:
       - uses: actions/upload-artifact@v3
         with:
           name: rpms
