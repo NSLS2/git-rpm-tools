@@ -1,0 +1,8 @@
+name: Run oneself to build self rpm
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - ./scripts/git-rpm-tools
