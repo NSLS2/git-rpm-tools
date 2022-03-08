@@ -9,4 +9,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: rpms
-          path: ./git-rpm-tools/*.rpm
+          path: ./*.rpm
