@@ -2,7 +2,7 @@
 
 An utility which aims to trivialize creating RPMs from an existing git repository. The workflow is as follows:
 
-1. Create and drop a .spec file in an existing git repository root
+1. Create and drop a .spec file in `dist/` directory of an existing git repository
 2. Run git-rpm-tools in the repository root
 3. Get .rpm (or .src.rpm or both) in the repository root
 
