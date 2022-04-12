@@ -147,15 +147,15 @@ function usage() {
     printf "Usage: %s [-v] [-x] [-b branch] [-s specfile] [cmd]\n" `basename $0`
     echo "
 Available options:
-  v                                          - be verbose about SNACK invocation
+  v                                          - be verbose
   x                                          - set -x for script debug
-  b                                          - branch to select when packing source
+  b                                          - branch to select when packing source (defaults to current)
   s                                          - .spec file to use
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
   ba                                         - perform both RPM and SRPM build"
-    exit 2
+  exit 2
 }
 
 while getopts 'vxhb:s:' arg
