@@ -45,7 +45,7 @@ function build_prep() {
 
     # TODO: figure out package name
     # currently use "${WORK_DIR##*/}"
-    PKG_NAME="${WORK_DIR##*/}"
+    PKG_NAME=${PKG_NAME:-"${WORK_DIR##*/}"}
     echo "Selecting package name: $PKG_NAME"
 
     # TODO: figure out where to build
@@ -132,7 +132,7 @@ function build_pkg() {
 
 function build_cleanup() {
     # Clean buildtree
-    rm -r $BUILD_TREE
+    [ -z "$DIRTY" ] && rm -r $BUILD_TREE
 }
 
 function git_rpm_build() {
@@ -144,13 +144,15 @@ function git_rpm_build() {
 }
 
 function usage() {
-    printf "Usage: %s [-v] [-x] [-b branch] [-s specfile] [cmd]\n" `basename $0`
+    printf "Usage: %s [-v] [-x] [-b branch] [-n pkgname] [-s specfile] [cmd]\n" `basename $0`
     echo "
 Available options:
   v                                          - be verbose
   x                                          - set -x for script debug
+  d                                          - be dirty, do not clean up build space
   b                                          - branch to select when packing source (defaults to current)
-  s                                          - .spec file to use
+  n                                          - package name to use (defaults to dir name)
+  s                                          - .spec file to use (defaults to package name)
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
@@ -158,13 +160,15 @@ Available commands:
   exit 2
 }
 
-while getopts 'vxhb:s:' arg
+while getopts 'vxdhb:n:s:' arg
 do
     case $arg in
     b)      GIT_BRANCH=$OPTARG;;
+    n)      PKG_NAME=$OPTARG;;
     s)      SPEC_FILE=$OPTARG;;
     v)      VERB=1;;
     x)      set -x;;
+    d)      DIRTY=1;;
     h)      usage;;
     ?)      usage;;
     esac
