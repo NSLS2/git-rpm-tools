@@ -64,7 +64,7 @@ function build_prep() {
     # Figure out package version
     # can use grep Version <>.spec | sed 's/Version.*\([0-9.]\+\)$/\1/g'
     # or rpmspec -q --queryformat='%{version}-%{release}' <>.spec
-    PKG_VERSION=$(rpmspec -q --queryformat='%{version}' $SPEC_FILE)
+    PKG_VERSION=$(rpmspec -q --queryformat='%{version}' --define "debug_package %{nil}" $SPEC_FILE)
     echo "Selecting package version: $PKG_VERSION"
     #
     #
@@ -85,7 +85,7 @@ function build_prep() {
 
     # Figure out dist identifier, e.g. epochtime-[branchname-]osver
     # using release number from spec for now
-    PKG_RELEASE=$(rpmspec -q --queryformat='%{release}' $SPEC_FILE)
+    PKG_RELEASE=$(rpmspec -q --queryformat='%{release}' --define "debug_package %{nil}" $SPEC_FILE)
     echo "Selecting package release: $PKG_RELEASE"
 }
 
