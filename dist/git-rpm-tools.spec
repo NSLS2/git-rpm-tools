@@ -1,6 +1,6 @@
 Name:           git-rpm-tools
 Version:        0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        RPM packaging helper for Git repos
 
 License:        GPL
@@ -22,6 +22,8 @@ Requires:       bash rpmdevtools
 %description
 A set of tools to facilitate RPM packaging of Git repositories
 
+%global debug_package %{nil}
+
 %prep
 %autosetup -p1
 
@@ -36,6 +38,9 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Fri Aug 19 2022 Derbenev, Anton <aderbenev@bnl.gov> - 0.2-2
+- Disabled debug package
+
 * Fri Aug 19 2022 Derbenev, Anton <aderbenev@bnl.gov> - 0.2-1
 - Added script version print-out
 
