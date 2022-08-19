@@ -1,5 +1,5 @@
 Name:           git-rpm-tools
-Version:        0.1
+Version:        0.2
 Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
@@ -36,6 +36,8 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Fri Aug 19 2022 Derbenev, Anton <aderbenev@bnl.gov> - 0.2-1
+- Added script version print-out
 
 * Mon Mar 7 2022 Anton Derbenev <aderbenev@bnl.gov> - 0.1-1
 - First version

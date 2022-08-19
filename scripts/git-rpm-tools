@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+VERSION=0.2
+
 # Print warning message in stderr
 # $1 - message to output
 warn() {
@@ -153,6 +155,7 @@ Available options:
   b                                          - branch to select when packing source (defaults to current)
   n                                          - package name to use (defaults to dir name)
   s                                          - .spec file to use (defaults to package name)
+  i                                          - print version info
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
@@ -160,7 +163,7 @@ Available commands:
   exit 2
 }
 
-while getopts 'vxdhb:n:s:' arg
+while getopts 'vxdhib:n:s:' arg
 do
     case $arg in
     b)      GIT_BRANCH=$OPTARG;;
@@ -170,6 +173,7 @@ do
     x)      set -x;;
     d)      DIRTY=1;;
     h)      usage;;
+    i)      echo "git-rpm-tools version ${VERSION}" && exit 0;;
     ?)      usage;;
     esac
 done
