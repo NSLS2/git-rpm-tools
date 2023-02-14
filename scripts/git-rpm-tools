@@ -134,7 +134,10 @@ function build_pkg() {
 
 function build_cleanup() {
     # Clean buildtree
-    [ -z "$DIRTY" ] && rm -r $BUILD_TREE
+    if [ -z "$DIRTY" ]; then
+        echo "Cleaning up $BUILD_TREE"
+        rm -rf $BUILD_TREE
+    fi
 }
 
 function git_rpm_build() {
@@ -143,6 +146,7 @@ function git_rpm_build() {
     build_prep
     build_pkg $1
     build_cleanup
+    exit 0
 }
 
 function usage() {
