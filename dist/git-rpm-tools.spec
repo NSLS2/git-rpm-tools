@@ -1,6 +1,6 @@
 Name:           git-rpm-tools
-Version:        0.3
-Release:        2%{?dist}
+Version:        0.4
+Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
 License:        BSD-3-Clause
@@ -38,6 +38,9 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Tue Apr 04 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.4-1
+- Added Makefile for self-rpm-build
+
 * Tue Apr 04 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.3-2
 - Added license info
 
