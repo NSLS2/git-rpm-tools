@@ -1,9 +1,9 @@
 Name:           git-rpm-tools
 Version:        0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        RPM packaging helper for Git repos
 
-License:        GPL
+License:        BSD-3-Clause
 URL:            https://github.com/NSLS2/git-rpm-tools
 Source0:        %{name}-%{version}.tar.gz
 
@@ -38,6 +38,9 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Tue Apr 04 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.3-2
+- Added license info
+
 * Tue Feb 14 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.3-1
 - Exit code fix, more verbosity on clean
 
