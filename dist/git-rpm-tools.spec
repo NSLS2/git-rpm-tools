@@ -1,5 +1,5 @@
 Name:           git-rpm-tools
-Version:        0.4
+Version:        0.5
 Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
@@ -38,6 +38,11 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Tue Oct 03 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.5-1
+- Added -a option to absorb uncommitted changes
+- Added clean command to remove rpms and build tree
+- Updated .gitignore
+
 * Tue Apr 04 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.4-1
 - Added Makefile for self-rpm-build
 
