@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 VERSION=0.2
+BUILD_TREE="$PWD/rpmbuildtree"
 
 # Print warning message in stderr
 # $1 - message to output
@@ -53,7 +54,7 @@ function build_prep() {
     # TODO: figure out where to build
     # currently use "rpmbuildtree"
     # !WARNING! This is cleaned up later
-    BUILD_TREE="$PWD/rpmbuildtree"
+    BUILD_TREE="$BUILD_TREE"
     echo "Selecting build tree: $BUILD_TREE"
     #[[ -d $BUILD_TREE ]] && die "Error: $BUILD_TREE exists, clean up first!"
 
@@ -149,6 +150,11 @@ function git_rpm_build() {
     exit 0
 }
 
+function clean() {
+    build_cleanup
+    rm -f *.rpm
+}
+
 function usage() {
     printf "Usage: %s [-v] [-x] [-b branch] [-n pkgname] [-s specfile] [cmd]\n" `basename $0`
     echo "
@@ -163,7 +169,8 @@ Available options:
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
-  ba                                         - perform both RPM and SRPM build"
+  ba                                         - perform both RPM and SRPM build
+  clean                                      - remove artifacts and the build tree"
   exit 2
 }
 
@@ -197,6 +204,9 @@ case "$cmd" in
         ;;
     ba)
         git_rpm_build ba
+        ;;
+    clean)
+        clean
         ;;
     *)
         usage
