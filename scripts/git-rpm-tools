@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-VERSION=0.2
+VERSION=0.5
+BUILD_TREE="$PWD/rpmbuildtree"
 
 # Print warning message in stderr
 # $1 - message to output
@@ -40,9 +41,17 @@ function build_prep() {
     WORK_DIR=$PWD
     echo "Selecting work dir: $WORK_DIR"
 
-    # TODO: figure out git branch
-    # currently use env variable, or current checked out
-    GIT_BRANCH=${GIT_BRANCH:-$(git branch --show-current)}
+    # If -a (ABSORB_LOCAL) is set, generate and use a temporary stash branch
+    # which includes any uncommitted local changes
+    # Else if -b is set, use the branch name provided to -b (GIT_BRANCH)
+    # Else, default to the currently checked out git branch
+    if [ -z ${ABSORB_LOCAL+x} ]; then
+        GIT_BRANCH=${GIT_BRANCH:-$(git branch --show-current)}
+    else
+        [[ $GIT_BRANCH ]] && echo "Warning: -b is suppressed since -a is set"
+        GIT_BRANCH=$(git stash create)
+        echo "Creating a temporary stash branch with local changes"
+    fi
     echo "Selecting branch: $GIT_BRANCH"
 
     # TODO: figure out package name
@@ -53,7 +62,7 @@ function build_prep() {
     # TODO: figure out where to build
     # currently use "rpmbuildtree"
     # !WARNING! This is cleaned up later
-    BUILD_TREE="$PWD/rpmbuildtree"
+    BUILD_TREE="$BUILD_TREE"
     echo "Selecting build tree: $BUILD_TREE"
     #[[ -d $BUILD_TREE ]] && die "Error: $BUILD_TREE exists, clean up first!"
 
@@ -149,6 +158,11 @@ function git_rpm_build() {
     exit 0
 }
 
+function clean() {
+    build_cleanup
+    rm -f *.rpm
+}
+
 function usage() {
     printf "Usage: %s [-v] [-x] [-b branch] [-n pkgname] [-s specfile] [cmd]\n" `basename $0`
     echo "
@@ -156,20 +170,23 @@ Available options:
   v                                          - be verbose
   x                                          - set -x for script debug
   d                                          - be dirty, do not clean up build space
-  b                                          - branch to select when packing source (defaults to current)
+  a                                          - absorb uncommitted changes when packing source (overrides -b)
+  b                                          - branch to select when packing source (current branch is default)
   n                                          - package name to use (defaults to dir name)
   s                                          - .spec file to use (defaults to package name)
   i                                          - print version info
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
-  ba                                         - perform both RPM and SRPM build"
+  ba                                         - perform both RPM and SRPM build
+  clean                                      - remove artifacts and the build tree"
   exit 2
 }
 
-while getopts 'vxdhib:n:s:' arg
+while getopts 'vxdhiab:n:s:' arg
 do
     case $arg in
+    a)      ABSORB_LOCAL=1;;
     b)      GIT_BRANCH=$OPTARG;;
     n)      PKG_NAME=$OPTARG;;
     s)      SPEC_FILE=$OPTARG;;
@@ -197,6 +214,9 @@ case "$cmd" in
         ;;
     ba)
         git_rpm_build ba
+        ;;
+    clean)
+        clean
         ;;
     *)
         usage

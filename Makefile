@@ -1,4 +1,4 @@
-.PHONY: dirs localinstall bundle flatbundle rpm srpm clean
+.PHONY: rpm srpm alldirty clean
 
 rpm:
 	./scripts/git-rpm-tools bb
@@ -6,5 +6,8 @@ rpm:
 srpm:
 	./scripts/git-rpm-tools bs
 
+alldirty:
+	./scripts/git-rpm-tools -d -a ba
+
 clean:
-	rm -rf *.rpm
+	./scripts/git-rpm-tools clean
