@@ -1,5 +1,5 @@
 Name:           git-rpm-tools
-Version:        0.5
+Version:        0.6
 Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
@@ -38,6 +38,9 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Tue Oct 03 2023 Wlodek, Jakub <jwlodek@bnl.gov> - 0.6-1
+- Add option to set install location for artifacts via an environment variable.
+
 * Tue Oct 03 2023 Derbenev, Anton <aderbenev@bnl.gov> - 0.5-1
 - Added -a option to absorb uncommitted changes
 - Added clean command to remove rpms and build tree

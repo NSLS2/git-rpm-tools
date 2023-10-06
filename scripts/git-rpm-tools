@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=0.5
+VERSION=0.6
 BUILD_TREE="$PWD/rpmbuildtree"
 
 # Print warning message in stderr
@@ -40,6 +40,10 @@ function build_prep() {
     #
     WORK_DIR=$PWD
     echo "Selecting work dir: $WORK_DIR"
+
+    # Can override storing artifacts in cwd by setting GRT_ART_STORAGE_LOC to directory
+    GRT_ART_STORAGE_LOC=${GRT_ART_STORAGE_LOC:-$WORK_DIR}
+    echo "Set artifact storage location to $GRT_ART_STORAGE_LOC"
 
     # If -a (ABSORB_LOCAL) is set, generate and use a temporary stash branch
     # which includes any uncommitted local changes
@@ -137,7 +141,7 @@ function build_pkg() {
     for art in "${artifacts[@]}"
     do
         echo "Copying artifacts: $art"
-        mv $art $WORK_DIR
+        mv $art $GRT_ART_STORAGE_LOC
     done
 }
 
