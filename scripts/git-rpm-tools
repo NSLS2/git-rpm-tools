@@ -100,7 +100,7 @@ function build_prep() {
     # Archive selected repo branch, put in SOURCES
     echo "Archiving sources to: $BUILD_TREE/SOURCES"
     mkdir -p $BUILD_TREE/SOURCES
-    git archive --prefix=${TARBALL_NAME%.tar.gz} --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$TARBALL_NAME
+    git archive --prefix="${TARBALL_NAME%.tar.gz}/" --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$TARBALL_NAME
 
     # Figure out dist identifier, e.g. epochtime-[branchname-]osver
     # using release number from spec for now
