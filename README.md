@@ -1,9 +1,21 @@
-# git-rpm-tools v0.1 prealpha
+# git-rpm-tools v0.7
 
-An utility which aims to trivialize creating RPMs from an existing git repository. The workflow is as follows:
+An utility which aims to trivialize creating RPMs from an existing git repository.
+
+The tool handles creation and cleanup of the rpmbuild tree, archiving the source code,
+moving .spec, .tar.gz, and .rpm files around, and performs various checks.
+
+## Usage
+
+The default workflow is as follows:
 
 1. Create and drop a .spec file in `dist/` directory of an existing git repository
-2. Run git-rpm-tools in the repository root
-3. Get .rpm (or .src.rpm or both) in the repository root
+2. Run `git-rpm-tools` in the repository root
+3. The .rpm (or .src.rpm or both) will be generated in the repository root
 
-The tool handles creation and cleanup of the rpmbuild tree, archiving the source code, moving .spec, .tar.gz, and .rpm files around, and performs various checks.
+See `git-rpm-tools -h` for list of all available options and customizations.
+Custom branch, package, source tarball name, and .spec file to use can be defined.
+
+## Dependencies
+
+`rpmdevtools` package is reqiuired to run the tool.
