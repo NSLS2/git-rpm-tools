@@ -81,6 +81,10 @@ function build_prep() {
     # or rpmspec -q --queryformat='%{version}-%{release}' <>.spec
     PKG_VERSION=$(rpmspec -q --queryformat='%{version}' --define "debug_package %{nil}" $SPEC_FILE)
     echo "Selecting package version: $PKG_VERSION"
+
+    # Figure out source tarball name
+    TARBALL_NAME=${TARBALL_NAME:-"$PKG_NAME-$PKG_VERSION.tar.gz"}
+    echo "Selecting tarball name: $TARBALL_NAME"
     #
     #
     # End resolve vars
@@ -96,7 +100,7 @@ function build_prep() {
     # Archive selected repo branch, put in SOURCES
     echo "Archiving sources to: $BUILD_TREE/SOURCES"
     mkdir -p $BUILD_TREE/SOURCES
-    git archive --prefix="$PKG_NAME-$PKG_VERSION/" --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$PKG_NAME-$PKG_VERSION.tar.gz
+    git archive --prefix=${TARBALL_NAME%.tar.gz} --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$TARBALL_NAME
 
     # Figure out dist identifier, e.g. epochtime-[branchname-]osver
     # using release number from spec for now
@@ -168,7 +172,7 @@ function clean() {
 }
 
 function usage() {
-    printf "Usage: %s [-v] [-x] [-b branch] [-n pkgname] [-s specfile] [cmd]\n" `basename $0`
+    printf "Usage: %s [-v] [-x] [-d] [-a] [-b branch] [-t tarball] [-n pkgname] [-s specfile] [cmd]\n" `basename $0`
     echo "
 Available options:
   v                                          - be verbose
@@ -176,9 +180,11 @@ Available options:
   d                                          - be dirty, do not clean up build space
   a                                          - absorb uncommitted changes when packing source (overrides -b)
   b                                          - branch to select when packing source (current branch is default)
+  t                                          - tarball name to use when packing source
   n                                          - package name to use (defaults to dir name)
   s                                          - .spec file to use (defaults to package name)
   i                                          - print version info
+  h                                          - show this help
 Available commands:
   bb                                         - perform RPM build (binary)
   bs                                         - perform SRPM build (source)
@@ -187,18 +193,19 @@ Available commands:
   exit 2
 }
 
-while getopts 'vxdhiab:n:s:' arg
+while getopts 'vxdhiab:n:s:t:' arg
 do
     case $arg in
-    a)      ABSORB_LOCAL=1;;
-    b)      GIT_BRANCH=$OPTARG;;
-    n)      PKG_NAME=$OPTARG;;
-    s)      SPEC_FILE=$OPTARG;;
     v)      VERB=1;;
     x)      set -x;;
     d)      DIRTY=1;;
-    h)      usage;;
+    a)      ABSORB_LOCAL=1;;
+    b)      GIT_BRANCH=$OPTARG;;
+    t)      TARBALL_NAME=$OPTARG;;
+    n)      PKG_NAME=$OPTARG;;
+    s)      SPEC_FILE=$OPTARG;;
     i)      echo "git-rpm-tools version ${VERSION}" && exit 0;;
+    h)      usage;;
     ?)      usage;;
     esac
 done

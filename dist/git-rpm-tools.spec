@@ -1,5 +1,5 @@
 Name:           git-rpm-tools
-Version:        0.6
+Version:        0.7
 Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
@@ -38,6 +38,10 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Wed Aug 14 2024 Derbenev, Anton <aderbenev@bnl.gov> - 0.7-1
+- Added an option to specify a custom source tarball name
+- Minor touch-ups to help message and options order
+
 * Tue Oct 03 2023 Wlodek, Jakub <jwlodek@bnl.gov> - 0.6-1
 - Add option to set install location for artifacts via an environment variable.
 
