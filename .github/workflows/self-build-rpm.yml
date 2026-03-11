@@ -1,14 +1,30 @@
-name: Run oneself to build self rpm
-on: workflow_dispatch
+---
+
+name: Build rpms with self
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
-  build-upload:
-    runs-on: self-hosted
+  build-rpm:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        el_version: [8, 9, 10]
+    container:
+      image: almalinux:${{ matrix.el_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - run: ./scripts/git-rpm-tools
-      - uses: actions/upload-artifact@v3
-        with:
-          name: rpms
-          path: ./*.rpm
+
+      - name: Install dependencies
+        run: |
+          dnf -y install rpmdevtools git
+
+      - name: Build RPMs
+        run: ./scripts/git-rpm-tools
