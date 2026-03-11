@@ -30,9 +30,11 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-
       - name: Add current dir to git safe directory
         run: git config --global --add safe.directory $PWD
+
+      - name: Switch to branch to leave detached head state
+        run: git switch -
 
       - name: Build RPMs
         run: ./scripts/git-rpm-tools
