@@ -24,7 +24,8 @@ jobs:
         run: |
           dnf -y install rpmdevtools git
 
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
