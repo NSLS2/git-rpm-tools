@@ -101,6 +101,9 @@ function build_prep() {
     echo "Archiving sources to: $BUILD_TREE/SOURCES"
     mkdir -p $BUILD_TREE/SOURCES
     git archive --prefix="${TARBALL_NAME%.tar.gz}/" --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$TARBALL_NAME
+    if [ $? -ne 0 ]; then
+        die "Error: git archive failed, cannot continue!"
+    fi
 
     # Figure out dist identifier, e.g. epochtime-[branchname-]osver
     # using release number from spec for now
@@ -122,6 +125,9 @@ function build_pkg() {
             --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
             --define "debug_package %{nil}" \
             -$1 $BUILD_TREE/SPECS/*.spec
+    if [ $? -ne 0 ]; then
+        die "Error: rpmbuild failed, cannot continue!"
+    fi
 
     # Move artifacts to root dir
     artifacts=()
