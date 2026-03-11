@@ -34,7 +34,7 @@ jobs:
         run: git config --global --add safe.directory $PWD
 
       - name: Switch to branch to leave detached head state
-        run: git switch checkout -b gha-build
+        run: git checkout -b gha-build
 
       - name: Build RPMs
         run: ./scripts/git-rpm-tools
