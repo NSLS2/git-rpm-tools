@@ -1,6 +1,6 @@
 ---
 
-name: Build rpms with self
+name: Build Self as RPM
 on:
   push:
     branches:
@@ -19,14 +19,15 @@ jobs:
     container:
       image: almalinux:${{ matrix.el_version }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
 
       - name: Install dependencies
         run: |
           dnf -y install rpmdevtools git
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Build RPMs
         run: ./scripts/git-rpm-tools
