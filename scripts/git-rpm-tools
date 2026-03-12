@@ -45,6 +45,14 @@ function build_prep() {
     GRT_ART_STORAGE_LOC=${GRT_ART_STORAGE_LOC:-$WORK_DIR}
     echo "Set artifact storage location to $GRT_ART_STORAGE_LOC"
 
+    # Check to make sure we aren't in a detached head state, which can cause issues with git archive
+    if [ -z "$GIT_BRANCH" ] && [ -z "$ABSORB_LOCAL" ] && [ -z "$DIRTY" ]; then
+        git_branch_check=$(git symbolic-ref --quiet HEAD 2> /dev/null)
+        if [ $? -ne 0 ]; then
+            die "Error: HEAD is detached, please specify a branch with -b or use -a to include local changes"
+        fi
+    fi
+
     # If -a (ABSORB_LOCAL) is set, generate and use a temporary stash branch
     # which includes any uncommitted local changes
     # Else if -b is set, use the branch name provided to -b (GIT_BRANCH)
@@ -101,6 +109,9 @@ function build_prep() {
     echo "Archiving sources to: $BUILD_TREE/SOURCES"
     mkdir -p $BUILD_TREE/SOURCES
     git archive --prefix="${TARBALL_NAME%.tar.gz}/" --format=tar.gz $GIT_BRANCH > $BUILD_TREE/SOURCES/$TARBALL_NAME
+    if [ $? -ne 0 ]; then
+        die "Error: git archive failed, cannot continue!"
+    fi
 
     # Figure out dist identifier, e.g. epochtime-[branchname-]osver
     # using release number from spec for now
@@ -122,6 +133,9 @@ function build_pkg() {
             --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
             --define "debug_package %{nil}" \
             -$1 $BUILD_TREE/SPECS/*.spec
+    if [ $? -ne 0 ]; then
+        die "Error: rpmbuild failed, cannot continue!"
+    fi
 
     # Move artifacts to root dir
     artifacts=()
