@@ -25,13 +25,11 @@ jobs:
           dnf -y install rpmdevtools git
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
+          set-safe-directory: true
           persist-credentials: false
           fetch-depth: 0
-
-      - name: Add current dir to git safe directory
-        run: git config --global --add safe.directory $PWD
 
       - name: Switch to branch to leave detached head state
         run: git checkout -b gha-build
