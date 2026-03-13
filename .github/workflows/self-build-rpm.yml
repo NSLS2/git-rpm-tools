@@ -20,5 +20,16 @@ jobs:
       image: almalinux:${{ matrix.el_version }}
     steps:
 
+      - name: Install dependencies
+        run: |
+          dnf -y install rpmdevtools git
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          set-safe-directory: true
+          persist-credentials: false
+          fetch-depth: 0
+
       - name: Build RPMs
         uses: ./.github/actions/build-rpm
