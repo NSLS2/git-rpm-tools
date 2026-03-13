@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=0.6
+VERSION=0.8
 BUILD_TREE="$PWD/rpmbuildtree"
 
 # Print warning message in stderr

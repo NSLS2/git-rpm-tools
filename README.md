@@ -1,4 +1,4 @@
-# git-rpm-tools v0.7
+# git-rpm-tools v0.8
 
 An utility which aims to trivialize creating RPMs from an existing git repository.
 

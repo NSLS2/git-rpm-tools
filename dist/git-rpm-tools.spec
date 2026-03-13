@@ -1,5 +1,5 @@
 Name:           git-rpm-tools
-Version:        0.7
+Version:        0.8
 Release:        1%{?dist}
 Summary:        RPM packaging helper for Git repos
 
@@ -38,6 +38,12 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
+* Fri Mar 13 2026 Wlodek, Jakub <jwlodek@bnl.gov> - 0.8-1
+- Add failure condition on cases where repo is in detatched HEAD state
+- Add failure condition if git archive command fails
+- Add failure condition if rpm build fails
+- Updates to github actions CI workflows
+
 * Wed Aug 14 2024 Derbenev, Anton <aderbenev@bnl.gov> - 0.7-1
 - Added an option to specify a custom source tarball name
 - Minor touch-ups to help message and options order

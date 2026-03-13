@@ -1,0 +1,52 @@
+---
+
+name: Publish RPMs and SRPMs on Release
+on:
+  release:
+    types: [published]
+jobs:
+  publish-rpm:
+    name: EL${{ matrix.el_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        el_version: [8, 9, 10]
+
+    container:
+      image: almalinux:${{ matrix.el_version }}
+
+    steps:
+      - name: Install dependencies
+        run: |
+          dnf -y install rpmdevtools git
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          set-safe-directory: true
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Build RPMs
+        uses: ./.github/actions/build-rpm
+
+      - name: Install GitHub CLI
+        run: |
+          dnf -y install 'dnf-command(config-manager)'
+          dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+          dnf -y install gh --repo gh-cli
+
+      - name: Upload RPM as release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} $GITHUB_WORKSPACE/*.rpm --clobber
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SRPM as release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} $GITHUB_WORKSPACE/*.src.rpm --clobber
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
