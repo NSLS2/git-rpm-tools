@@ -21,4 +21,4 @@ jobs:
     steps:
 
       - name: Build RPMs
-        uses: ./.github/actions/build-rpm.yml
+        uses: ./.github/actions/build-rpm

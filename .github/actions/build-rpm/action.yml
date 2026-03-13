@@ -1,0 +1,28 @@
+---
+
+name: Build RPM
+description: Use git-rpm-tools to build self as RPM and SRPM
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      run: |
+        dnf -y install rpmdevtools git
+      shell: bash
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        set-safe-directory: true
+        persist-credentials: false
+        fetch-depth: 0
+
+    - name: Switch to branch to leave detached head state
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        git checkout -b gha-build
+      shell: bash
+
+    - name: Build RPMs and SRPMs
+      run: ./scripts/git-rpm-tools -v -x ba
+      shell: bash
