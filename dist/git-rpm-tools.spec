@@ -38,7 +38,7 @@ cp ./scripts/git-rpm-tools %{buildroot}/usr/local/bin
 /usr/local/bin/*
 
 %changelog
-* Fri Mar 13 2026, Wlodek, Jakub <jwlodek@bnl.gov> - 0.8-1
+* Fri Mar 13 2026 Wlodek, Jakub <jwlodek@bnl.gov> - 0.8-1
 - Add failure condition on cases where repo is in detatched HEAD state
 - Add failure condition if git archive command fails
 - Add failure condition if rpm build fails
