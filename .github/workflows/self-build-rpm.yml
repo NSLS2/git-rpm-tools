@@ -20,21 +20,5 @@ jobs:
       image: almalinux:${{ matrix.el_version }}
     steps:
 
-      - name: Install dependencies
-        run: |
-          dnf -y install rpmdevtools git
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          set-safe-directory: true
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Switch to branch to leave detached head state
-        run: |
-          git config --global --add safe.directory $GITHUB_WORKSPACE
-          git checkout -b gha-build
-
       - name: Build RPMs
-        run: ./scripts/git-rpm-tools
+        uses: ./.github/actions/build-rpm.yml

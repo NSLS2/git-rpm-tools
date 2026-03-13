@@ -1,0 +1,29 @@
+---
+
+name: Publish RPMs and SRPMs on Release
+on:
+  release:
+    types: [published]
+jobs:
+  publish-rpm:
+    name: EL${{ matrix.el_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        el_version: [8, 9, 10]
+
+    container:
+      image: almalinux:${{ matrix.el_version }}
+
+    steps:
+      - name: Build RPMs
+        uses: ./.github/actions/build-rpm.yml
+
+      - name: Upload RPM as release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} $GITHUB_WORKSPACE/*.rpm --clobber
+
+      - name: Upload SRPM as release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} $GITHUB_WORKSPACE/*.src.rpm --clobber
